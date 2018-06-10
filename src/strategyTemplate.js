@@ -6,6 +6,8 @@ const redisClient = redisLib.createClient();
 const redis = Promise.promisifyAll(redisClient);
 const redisPub = redisClient.duplicate();
 
+const tvLoader = require('crypto-signal-finder/tv-loader');
+
 module.exports = class Strategy {
 
     constructor({ name }) {
@@ -21,17 +23,16 @@ module.exports = class Strategy {
     }
 
     test(signal) {
-
     }
 
     notify() {
         const { name: strategy, bid, exchange, symbolId, timeframe } = this;
         redisPub.publish('trade', { strategy, bid, exchange, symbolId, timeframe });
-        debug('start trade on ' + symbolId)
+        debug(`start trade [strategy:${strategy}] on ${symbolId}`)
     }
 
-    async getTicker({ exchange, symbolId }) {
-
+    async getTicker({ exchange: exchangeId, symbolId }) {
+        return await  tvLoader({ filter: symbolId, exchangeId })
     }
 
     async findSignal({ exchange, symbolId, timeframe, position }) {
