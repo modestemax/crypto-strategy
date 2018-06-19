@@ -41,8 +41,10 @@ module.exports = class Strategy {
 
     async findSignal({ exchange, symbolId, timeframe, position }) {
         let key = await getKey({ exchange, symbolId, timeframe, position });
-        let signal = await redis.getAsync(key);
-        return JSON.parse(signal);
+        if (key) {
+            let signal = await redis.getAsync(key);
+            return JSON.parse(signal);
+        }
     }
 
     change({ open, close }) {

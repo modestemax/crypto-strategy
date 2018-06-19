@@ -10,7 +10,7 @@ redisSub.on('pmessage', async (pattern, channel, data) => {
     debug(channel + ' received');
     const signal = JSON.parse(data);
 
-    strategy.testEma.check(signal);
+    // strategy.testEma.check(signal);
     strategy.emaH1H4.check(signal);
 
 });
