@@ -6,7 +6,7 @@ const redisClient = redisLib.createClient();
 const redis = Promise.promisifyAll(redisClient);
 const redisPub = redisClient.duplicate();
 
-const tvLoader = require('crypto-signal-finder/tv-loader');
+const tvLoader = require('crypto-signal-finder/src/tv-loader');
 
 module.exports = class Strategy {
 
@@ -14,8 +14,9 @@ module.exports = class Strategy {
         Object.assign(this, { bid: null, name });
     }
 
-    check(signal) {
-        if (this.test(signal)) {
+    async check(signal) {
+        if (await this.test(signal)) {
+            debug(`${this.name} test OK`);
             const { exchange, symbolId, timeframe } = signal.candle;
             Object.assign(this, { symbolId, timeframe, exchange });
             this.notify();
@@ -27,18 +28,25 @@ module.exports = class Strategy {
 
     notify() {
         const { name: strategy, bid, exchange, symbolId, timeframe } = this;
-        redisPub.publish('trade', { strategy, bid, exchange, symbolId, timeframe });
-        debug(`start trade [strategy:${strategy}] on ${symbolId}`)
+        if (bid) {
+            redisPub.publish('crypto-bid', JSON.stringify({ strategy, bid, exchange, symbolId, timeframe }));
+            debug(`start trade [strategy:${strategy}] on ${symbolId} at bid: ${bid}`)
+        }
     }
 
     async getTicker({ exchange: exchangeId, symbolId }) {
-        return await  tvLoader({ filter: symbolId, exchangeId })
+        let tick = await  tvLoader({ filter: symbolId, exchangeId });
+        return tick[symbolId]
     }
 
     async findSignal({ exchange, symbolId, timeframe, position }) {
         let key = await getKey({ exchange, symbolId, timeframe, position });
         let signal = await redis.getAsync(key);
         return JSON.parse(signal);
+    }
+
+    change({ open, close }) {
+        return (close - open) / open * 100;
     }
 };
 

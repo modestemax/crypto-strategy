@@ -1,13 +1,15 @@
-Template = require('./strategyTemplate');
+Template = require('./strategyBase');
 
 module.exports = class extends Template {
     constructor(signalFinder) {
         super({ name: 'testEma', signalFinder })
     }
 
-    test(signal) {
-        if (signal.ema10Above20 && signal.plusDiAboveMinusDi && signal.adxAboveRef && signal.adxIsTrendingUp) {
-            this.bid = 1;
+    async test(signal) {
+        if (signal.ema10Above20 && signal.plusDiAboveMinusDi /*&& signal.adxAboveRef && signal.adxIsTrendingUp*/) {
+            const { exchange, symbolId, timeframe } = signal.candle;
+            let ticker = await this.getTicker({ exchange, symbolId });
+            this.bid = ticker.bid;
             return true;
         }
     }
