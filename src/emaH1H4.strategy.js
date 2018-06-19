@@ -7,14 +7,14 @@ module.exports = class extends Template {
         super({ name: 'EMA H1H4', signalFinder })
     }
 
-    async test(signal) {
-        const { exchange, symbolId, timeframe } = signal.candle;
+    async test(signalH4) {
+        const { exchange, symbolId, timeframe } = signalH4.candle;
         //timeframe H4
-        if (+timeframe === 4 * 60 && signal.ema10Above20) {
+        if (+timeframe === 4 * 60 && signalH4.ema10Above20) {
             debug(`${symbolId} EMA H4 OK`);
             const signal24H = await this.findSignal({ exchange, symbolId, timeframe, position: 6 });
             //24H change must >2
-            if (signal24H && this.change({ open: signal24H.candle.open, close: signal.candle.close }) > 2) {
+            if (signal24H && this.change({ open: signal24H.candle.open, close: signalH4.candle.close }) > 2) {
                 debug(`${symbolId} Change24h > 2% OK`);
                 const signalH4_1 = await this.findSignal({ exchange, symbolId, timeframe, position: 1 });
                 //crossing signal
@@ -28,7 +28,7 @@ module.exports = class extends Template {
                         debug(`${symbolId} EMA H1 Trend OK`);
                         let ticker = await this.getTicker({ exchange, symbolId });
                         if (ticker && ticker.bid) {
-                            this.bid = Math.min(ticker.bid, ticker.open);
+                            this.bid = Math.min(ticker.bid, signalH4.candle.open);
                             debug(`${symbolId} BID AT ${this.bid}`);
                             return true;
                         }
