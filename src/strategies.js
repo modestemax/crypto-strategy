@@ -1,7 +1,5 @@
-const TestEma = require('./testEma01.strategy');
-const EmaH1H4 = require('./emaH1H4.strategy');
+const { strategies } = require('common/settings');
 
-module.exports = {
-    testEma: new TestEma(),
-    emaH1H4: new EmaH1H4()
-};
+module.exports = strategies.reduce(strategies, (strategies, strat_name) => {
+    return Object.assign(strategies, { [strat_name]: new (require(`./${strat_name}.strategy`))() })
+}, {});
