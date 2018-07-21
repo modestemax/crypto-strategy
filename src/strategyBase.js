@@ -6,7 +6,7 @@ const redisClient = redisLib.createClient();
 const redis = Promise.promisifyAll(redisClient);
 const redisPub = redisClient.duplicate();
 
-const tvLoader = require('crypto-signal-finder/src/tv-loader');
+const tvLoader = require('A.compile/src/tv-loader');
 
 module.exports = class Strategy {
 

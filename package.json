@@ -1,5 +1,5 @@
 {
-  "name": "crypto-strategies",
+  "name": "build",
   "version": "1.0.0",
   "description": "implement crypto trading strategies",
   "main": "index.js",
@@ -10,9 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.5.1",
-    "crypto-signal-finder": "file:../crypto-signal-finder",
     "debug": "^3.1.0",
-    "indicators-builder": "file:../crypto-signal-finder",
     "lodash": "^4.17.10",
     "redis": "^2.8.0"
   }
