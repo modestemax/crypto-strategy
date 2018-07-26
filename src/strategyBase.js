@@ -10,8 +10,8 @@ const tvLoader = require('A.compile/src/tv-loader');
 
 module.exports = class Strategy {
 
-    constructor({ name }) {
-        Object.assign(this, { bid: null, name });
+    constructor({ name, options }) {
+        Object.assign(this, { bid: null, name, options });
     }
 
     async check(signal) {
@@ -27,15 +27,15 @@ module.exports = class Strategy {
     }
 
     notify() {
-        const { name: strategy, bid, exchange, symbolId, timeframe } = this;
+        const { name: strategy, options: strategyOptions, bid, exchange, symbolId, timeframe } = this;
         if (bid) {
-            redisPub.publish('crypto-bid', JSON.stringify({ strategy, bid, exchange, symbolId, timeframe }));
+            redisPub.publish('crypto-bid', JSON.stringify({ strategy, strategyOptions, bid, exchange, symbolId, timeframe }));
             debug(`start trade [strategy:${strategy}] on ${symbolId} at bid: ${bid}`)
         }
     }
 
     async getTicker({ exchange: exchangeId, symbolId }) {
-        let tick = await  tvLoader({ filter: symbolId, exchangeId });
+        let tick = await tvLoader({ filter: symbolId, exchangeId });
         return tick[symbolId]
     }
 

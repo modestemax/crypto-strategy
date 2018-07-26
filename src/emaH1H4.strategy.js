@@ -3,8 +3,8 @@ const debug = require('debug')('strategy:emah1h4');
 Template = require('./strategyBase');
 
 module.exports = class extends Template {
-    constructor(signalFinder) {
-        super({ name: 'EMA H1H4', signalFinder })
+    constructor(options) {
+        super({ name: 'EMA H1H4', options })
     }
 
     async test(signalH4) {
