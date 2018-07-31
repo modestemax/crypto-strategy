@@ -7,12 +7,13 @@ const strategy = require('./strategies');
 
 
 redisSub.on('pmessage', async (pattern, channel, data) => {
-    debug(channel + ' received');
-    const signal = JSON.parse(data);
+    //debug(channel + ' received');
+    if (/newData:.*/.test(channel)) {
+        const signal = JSON.parse(data);
 
-    strategy.testEma01.check(signal);
-    strategy.emaH1H4.check(signal);
-
+        strategy.testEma01.check(signal);
+        strategy.emaH1H4.check(signal);
+    }
 });
 
 
