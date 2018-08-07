@@ -15,23 +15,48 @@ module.exports = class Strategy {
     }
 
     async check(signal) {
-        if (await this.test(signal)) {
-            debug(`${this.name} test OK`);
-            const { exchange, symbolId, timeframe } = signal.candle;
-            Object.assign(this, { symbolId, timeframe, exchange });
-            this.notify();
-        }
-    }
-
-    test(signal) {
-    }
-
-    notify() {
-        const { name: strategy, options: strategyOptions, bid, exchange, symbolId, timeframe } = this;
+        let bid = await this.canBuy(signal);
+        let ask = await this.canSell(signal);
+        const { exchange, symbolId, timeframe } = signal.candle;
+        Object.assign(this, { symbolId, bid, ask, timeframe, exchange });
         if (bid) {
-            redisPub.publish('crypto-bid', JSON.stringify({ strategy, strategyOptions, bid, exchange, symbolId, timeframe }));
-            debug(`start trade [strategy:${strategy}] on ${symbolId} at bid: ${bid}`)
+            debug(`${this.name} Buy OK`);
+            this.notifyBuy();
+        } else if (ask) {
+            debug(`${this.name} Sell OK`);
+            this.notifySell();
         }
+    }
+
+
+    canBuy(signal) {
+    }
+    canSell(signal) {
+    }
+    notifyBuy() {
+        this.notify('BUY')
+    }
+    notifySell() {
+        this.notify('SELL')
+    }
+    notify(side) {
+        const { name: strategy, options: strategyOptions, ask, bid, exchange, symbolId, timeframe } = this;
+        let order = JSON.stringify({ strategy, strategyOptions, bid, ask, exchange, symbolId, timeframe });
+        switch (side) {
+            case 'BUY':
+                if (bid) {
+                    redisPub.publish('crypto-bid', order);
+                    debug(`[strategy:${strategy}] ${side} ${symbolId} at price: ${bid}`)
+                }
+                break;
+            case 'SELL':
+                if (ask) {
+                    redisPub.publish('crypto-ask', order);
+                    debug(`[strategy:${strategy}] ${side} ${symbolId} at price: ${ask}`)
+                }
+                break;
+        }
+
     }
 
     async getTicker({ exchange: exchangeId, symbolId }) {

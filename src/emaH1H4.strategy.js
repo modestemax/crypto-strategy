@@ -7,7 +7,7 @@ module.exports = class extends Template {
         super({ name: 'EMA H1H4', options })
     }
 
-    async test(signalH4) {
+    async canBuy(signalH4) {
         const { exchange, symbolId, timeframe } = signalH4.candle;
         //timeframe H4
         if (+timeframe === 4 * 60 && signalH4.ema10Above20) {
@@ -27,10 +27,9 @@ module.exports = class extends Template {
                         debug(`${symbolId} EMA H1 OK`);
                         debug(`${symbolId} EMA H1 Trend OK`);
                         let ticker = await this.getTicker({ exchange, symbolId });
-                        if (ticker && ticker.bid) {
-                            this.bid = Math.min(ticker.bid, signalH4.candle.open);
+                        if (ticker && ticker.bid) {                            
                             debug(`${symbolId} BID AT ${this.bid}`);
-                            return true;
+                            return Math.min(ticker.bid, signalH4.candle.open);
                         }
                     }
 
