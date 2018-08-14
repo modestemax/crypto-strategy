@@ -9,6 +9,7 @@ const strategies = require('./strategies');
 redisSub.on('pmessage', async (pattern, channel, data) => {
     //debug(channel + ' received');
     if (/newData:.*/.test(channel)) {
+        debug('data received');
         const signal = JSON.parse(data);
         for(let strategy in strategies){
             strategies[strategy].check(signal);
