@@ -18,7 +18,7 @@ module.exports = class extends Template {
         // if (signal.ema10Above20 && signal.plusDiAboveMinusDi /*&& signal.adxAboveRef && signal.adxIsTrendingUp*/) {
             if(symbolId==='TUSDBTC'){
             let ticker = await this.getTicker({ exchange, symbolId });
-            return ticker.ask;            
+            //return ticker.ask;            
         }
     }
 }
